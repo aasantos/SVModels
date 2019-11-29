@@ -20,7 +20,6 @@ void dlmsimul(double sigmav,double phi1,double sigma1,
     }
 }
 
-
 void DLM::simulatestates()
 {
     double sigmavsq = this->sigmav*this->sigmav;
@@ -131,15 +130,6 @@ void DLM::setprior(struct PriorStruct prior)
         this->sigma1invgaussianprior[0] = prior.sigma1prior[0];
         this->sigma1invgaussianprior[1] = prior.sigma1prior[1];
     }
-}
-
-void DLM::setinits(struct InitsStruct inits)
-{
-    this->n = inits.n;
-    this->sigmav = inits.sigmav;
-    this->phi1 = inits.phi1;
-    this->sigma1 = inits.sigma1;
-    for(int i=0;i<this->n;i++) this->alpha[i] = inits.alpha[i];
 }
 
 double DLM::getalpha(int k)

@@ -13,41 +13,19 @@
 #include "SV.hpp"
 
 
-void sv2fsimul(double sigmav,double phi1,double sigma1,double phi2,double sigma2,double *y,double *alpha,double *beta,int n,Random *random);
-
-struct PriorStruct2f : PriorStruct
+struct PriorStructSV2F
 {
+    int sigmavpriortype;
+    int phi1priortype;
+    int sigma1priortype;
+    double sigmavprior[2];
+    double phi1prior[2];
+    double sigma1prior[2];
     int phi2priortype;
     int sigma2priortype;
     double phi2prior[2];
     double sigma2prior[2];
 };
-
-
-struct InitsStruct2f : InitsStruct
-{
-    double phi2;
-    double sigma2;
-    double *beta;
-};
-
-
-
-void sv2fsimul(double sigmav,double phi1,double sigma1,
-               double phi2,double sigma2,double *y,
-               double *alpha,double *beta,int n,Random *random);
-
-
-void svfirstsecondderiv(double sigmav,double phi1,double sigma1,
-                        double phi2,double sigma2,
-                        double y,double a,double b,
-                        double a0,double a1,double b0,double b1,
-                        double fd[2],double sdinv[4]);
-
-void svnewton(double sigmav,double phi1,double sigma1,
-              double phi2,double sigma2,double y,double a,
-              double b,double a0,double a1,double b0,
-              double b1,double sol[2],double sdinv[4]);
 
 
 class SV2F: public SV{
@@ -115,6 +93,11 @@ public:
         }
     }
     
+    void firstsecondderiv(double yy,double a,double b,double a0,double a1,double b0,double b1,
+                          double fd[2],double sdinv[4]);
+    
+    void newton(double yy,double a,double b,double a0,double a1,double b0,
+                double b1,double sol[2],double sdinv[4]);
     
      double logpdfbivariatenormal(double x[2],double mm[2],double vcv[4]);
      //
@@ -129,30 +112,26 @@ public:
      void singlestatesimulate(double y,double a0,double a,double a1,
                               double b0,double b,double b1,
                               double abnew[2]);
-     //
      void simulatestates();
       //
-     void singlestatesimulateAdaptation(double y,double a0,double a,double a1,
+     void singlestatesimulateadaptation(double y,double a0,double a,double a1,
                               double b0,double b,double b1,
                               double abnew[2]);
+     void simulatestatesadaptation(int k);
      //
-     void simulatestatesAdaptation(int k);
      void simulateparameters();
      //
      double getalpha(int k);
      double getbeta(int k);
-    //
-    double getphi2();
-    double getsigma2();
+     //
+     double getphi2();
+     double getsigma2();
     
      void setalpha(double *a);
      void setbeta(double *b);
-    
      //
-     
+    void setprior(struct PriorStructSV2F prior);
     
-    void setprior(struct PriorStruct2f prior);
-    void setinits(struct InitsStruct2f inits);
 };
 
 #endif /* SV2F_hpp */

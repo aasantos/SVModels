@@ -7,74 +7,51 @@
 //
 
 #include "SV2F.hpp"
-
-
-void sv2fsimul(double sigmav,double phi1,double sigma1,double phi2,double sigma2,double *y,double *alpha,double *beta,int n,Random *random)
+//
+//
+void SV2F::firstsecondderiv(double yy,double a,double b,double a0,
+                            double a1,double b0,double b1,double fd[2],double sdinv[4])
 {
-    double a = 0.0;
-    double b = 0.0;
-    for(int i=0;i<100;i++){
-        a = phi1*a + sigma1*random->normal();
-        b = phi2*b + sigma2*random->normal();
-    }
-    for(int i=0;i<n;i++){
-        a = phi1*a + sigma1*random->normal();
-        b = phi2*b + sigma2*random->normal();
-        alpha[i] = a;
-        beta[i] = b;
-        y[i] = sigmav*exp(0.5*a + 0.5*b)*random->normal();
-    }
-}
-
-
-
-void svfirstsecondderiv(double sigmav,double phi1,double sigma1,
-                        double phi2,double sigma2, double y,
-                        double a,double b,double a0,double a1,
-                        double b0,double b1, double fd[2],double sdinv[4])
-{
-    double sigmavsq = sigmav*sigmav;
-    double sigma1sq = sigma1*sigma1;
-    double sigma2sq = sigma2*sigma2;
-    double dfa = -0.5 + 0.5*y*y*exp(-a - b)/sigmavsq +
-    (a1 - phi1*a)*phi1/sigma1sq - (a - phi1*a0)/sigma1sq;
-    double dfb = -0.5 + 0.5*y*y*exp(-a - b)/sigmavsq +
-    (b1 - phi2*b)*phi2/sigma2sq - (b - phi2*b0)/sigma2sq;
+    double sigmavsq = this->sigmav*this->sigmav;
+    double sigma1sq = this->sigma1*this->sigma1;
+    double sigma2sq = this->sigma2*this->sigma2;
+    double dfa = -0.5 + 0.5*yy*yy*exp(-a - b)/sigmavsq +
+    (a1 - this->phi1*a)*this->phi1/sigma1sq - (a - this->phi1*a0)/sigma1sq;
+    double dfb = -0.5 + 0.5*yy*yy*exp(-a - b)/sigmavsq +
+    (b1 - this->phi2*b)*this->phi2/sigma2sq - (b - this->phi2*b0)/sigma2sq;
     fd[0] = dfa;
     fd[1] = dfb;
     //
     //
-    double tt = y*y*exp(-a - b);
-    double dfaa = 0.5*(tt*sigma1sq + 2.0*sigmavsq*(1.0 + phi1*phi1))/(sigmavsq*sigma1sq);
+    double tt = yy*yy*exp(-a - b);
+    double dfaa = 0.5*(tt*sigma1sq + 2.0*sigmavsq*(1.0 + this->phi1*this->phi1))/(sigmavsq*sigma1sq);
     double dfab = 0.5*tt/sigmavsq;
-    double dfbb = 0.5*(tt*sigma2sq + 2.0*sigmavsq*(1.0 + phi2*phi2))/(sigmavsq*sigma2sq);
+    double dfbb = 0.5*(tt*sigma2sq + 2.0*sigmavsq*(1.0 + this->phi2*this->phi2))/(sigmavsq*sigma2sq);
     double ddd = dfaa*dfbb - dfab*dfab;
     sdinv[0] = dfbb/ddd;
     sdinv[1] = -1.0*dfab/ddd;
     sdinv[2] = sdinv[1];
     sdinv[3] = dfaa/ddd;
 }
-
-void svnewton(double sigmav,double phi1,double sigma1,double phi2,double sigma2,
-              double y,double a,double b,double a0,double a1,double b0,double b1,
-              double sol[2],double sdinv[4])
+//
+//
+void SV2F::newton(double yy,double a,double b,double a0,double a1,double b0,
+double b1,double sol[2],double sdinv[4])
 {
     double fd[2];
     sol[0] = a;
     sol[1] = b;
-    svfirstsecondderiv(sigmav, phi1, sigma1, phi2, sigma2, y,
-                       sol[0], sol[1], a0, a1, b0, b1, fd, sdinv);
+    this->firstsecondderiv(yy,sol[0], sol[1], a0, a1, b0, b1, fd,sdinv);
     int niter = 0;
     while(norm(fd) > 0.000001 && niter < 30){
-        svfirstsecondderiv(sigmav, phi1, sigma1, phi2, sigma2,
-                           y, sol[0], sol[1], a0, a1, b0, b1, fd, sdinv);
+        this->firstsecondderiv(yy, sol[0], sol[1], a0, a1, b0, b1, fd,sdinv);
         sol[0] = sol[0] + sdinv[0]*fd[0] + sdinv[1]*fd[1];
         sol[1] = sol[1] + sdinv[2]*fd[0] + sdinv[3]*fd[1];
         niter++;
     }
 }
-
-
+//
+//
 double SV2F::logpdfbivariatenormal(double x[2],double mm[2],double vcv[4])
 {
     double rho = vcv[1]/sqrt(vcv[0]*vcv[3]);
@@ -89,7 +66,8 @@ double SV2F::logpdfbivariatenormal(double x[2],double mm[2],double vcv[4])
     return -1.0*log(2.0*3.1415926535897932385*sqrt(s1sq)*sqrt(s1sq)*sqrt(1.0 - rho*rho))
     - 0.5*zz/(1.0 - rho*rho);
 }
-
+//
+//
 double SV2F::logpdfsv2f(double yy,double a0,double a,double a1,double b0,double b,double b1)
 {
     double t1 = -0.5*a - 0.5*b - 0.5*yy*yy/(this->sigmav*this->sigmav*exp(a + b));
@@ -99,7 +77,8 @@ double SV2F::logpdfsv2f(double yy,double a0,double a,double a1,double b0,double 
     double t5 = -0.5*(b - this->phi2*b0)*(b - this->phi2*b0)/(this->sigma2*this->sigma2);
     return t1 + t2 + t3 + t4 + t5;
 }
-
+//
+//
 double SV2F::metroprob(double anew,double bnew, double yy,
                  double a0,double a,double a1,
                  double b0,double b,double b1,double mm[2],double vcv[4])
@@ -115,15 +94,15 @@ double SV2F::metroprob(double anew,double bnew, double yy,
     if(tt > 0.0) tt = 0.0;
     return exp(tt);
 }
-
+//
+//
 void SV2F::singlestatesimulate(double yy,double a0,double a,double a1,
                          double b0,double b,double b1,
                          double abnew[2])
 {
     double mm[2];
     double SS[4];
-    svnewton(this->sigmav, this->phi1, this->sigma1, this->phi2, this->sigma2,
-             yy, a, b, a0, a1, b0, b1, mm, SS);
+    this->newton(yy, a, b, a0, a1, b0, b1, mm, SS);
     double mmf[2];
     mmf[0] = (double)mm[0];
     mmf[1] = (double)mm[1];
@@ -134,7 +113,7 @@ void SV2F::singlestatesimulate(double yy,double a0,double a,double a1,
     SSf[3] = (double)SS[3];
     double prop[2];
     random->bivariatenormal(mmf, SSf, prop);
-    double mprob = metroprob((double)prop[0], (double)prop[1], yy, a0, a, a1,
+    double mprob = this->metroprob((double)prop[0], (double)prop[1], yy, a0, a, a1,
                              b0, b, b1,
                              mm, SS);
     if(random->uniform() < mprob){
@@ -145,15 +124,15 @@ void SV2F::singlestatesimulate(double yy,double a0,double a,double a1,
         abnew[1] = b;
     }
 }
-
-void SV2F::singlestatesimulateAdaptation(double yy,double a0,double a,double a1,
+//
+//
+void SV2F::singlestatesimulateadaptation(double yy,double a0,double a,double a1,
                                double b0,double b,double b1,
                                double abnew[2])
 {
     double mm[2];
     double SS[4];
-    svnewton(sigmav, phi1, sigma1, phi2, sigma2,
-             yy, a, b, a0, a1, b0, b1, mm, SS);
+    this->newton(yy, a, b, a0, a1, b0, b1, mm, SS);
     double mmf[2];
     mmf[0] = (double)mm[0];
     mmf[1] = (double)mm[1];
@@ -167,8 +146,8 @@ void SV2F::singlestatesimulateAdaptation(double yy,double a0,double a,double a1,
     abnew[0] = (double)prop[0];
     abnew[1] = (double)prop[1];
 }
-
-
+//
+//
 void SV2F::simulatestates()
 {
     double a0 = 0.0;
@@ -208,8 +187,9 @@ void SV2F::simulatestates()
     this->betalast = this->phi2*this->beta[this->n - 2] +
     this->sigma2*this->random->normal();
 }
-
-void SV2F::simulatestatesAdaptation(int k)
+//
+//
+void SV2F::simulatestatesadaptation(int k)
 {
     for(int jj=0;jj<k;jj++){
         double a0 = 0.0;
@@ -240,7 +220,7 @@ void SV2F::simulatestatesAdaptation(int k)
                 yy = this->y[i];
             }
             double abnew[2];
-            singlestatesimulateAdaptation(yy, a0, this->alpha[i], a1, b0, this->beta[i], b1, abnew);
+            singlestatesimulateadaptation(yy, a0, this->alpha[i], a1, b0, this->beta[i], b1, abnew);
             this->alpha[i] = abnew[0];
             this->beta[i] = abnew[1];
         }
@@ -250,18 +230,20 @@ void SV2F::simulatestatesAdaptation(int k)
         this->sigma2*this->random->normal();
     }
 }
-
+//
+//
 double SV2F::getalpha(int k)
 {
     return this->alpha[k];
 }
-
+//
+//
 double SV2F::getbeta(int k)
 {
     return this->beta[k];
 }
-
-
+//
+//
 void SV2F::simulateparameters()
 {
     AR1Model *ar1 = new AR1Model(this->alpha,this->n,this->phi1,this->sigma1,this->random);
@@ -323,8 +305,9 @@ void SV2F::simulateparameters()
                free(err);
            }
 }
-
-void SV2F::setprior(struct PriorStruct2f prior)
+//
+//
+void SV2F::setprior(struct PriorStructSV2F prior)
 {
     this->sigmavpriortype = prior.sigmavpriortype;
     this->phi1priortype = prior.phi1priortype;
@@ -383,15 +366,6 @@ void SV2F::setprior(struct PriorStruct2f prior)
        }
 }
 
-void SV2F::setinits(struct InitsStruct2f inits)
-{
-    this->n = inits.n;
-    this->sigmav = inits.sigmav;
-    this->phi1 = inits.phi1;
-    this->sigma1 = inits.sigma1;
-    this->phi2 = inits.phi2;
-    this->sigma2 = inits.sigma2;
-}
 
 void SV2F::setalpha(double *a)
 {

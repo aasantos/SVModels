@@ -146,8 +146,6 @@ public:
         this->sigmalognormalprior[1] = 0.5;
         this->sigmainvgaussianprior[0] = 0.5;
         this->sigmainvgaussianprior[1] = 0.5;
-        
-        
     }
     
     

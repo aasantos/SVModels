@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "Random.hpp"
-#include "Utils.hpp"
+#include "func.hpp"
 #include "Stats.hpp"
 #include "NormalBayesian.hpp"
 #include "RegModel.hpp"
@@ -33,17 +33,6 @@ struct PriorStruct
     double phi1prior[2];
     double sigma1prior[2];
 };
-
-
-struct InitsStruct
-{
-    int n;
-    double sigmav;
-    double phi1;
-    double sigma1;
-    double *alpha;
-};
-
 
 class DLM{
 //
@@ -104,8 +93,8 @@ public:
         this->phi1priortype = 1; // 0-normal 1-beta
         this->phi1prior[0] = 0.9;
         this->phi1prior[1] = 0.5;
-        this->phi1betaprior[0] = 98.0;
-        this->phi1betaprior[1] = 2.0;
+        this->phi1betaprior[0] = 95.0;
+        this->phi1betaprior[1] =  5.0;
         //
         this->sigma1priortype = 1; //0-invgamma 1-lognormal 2-invgaussian
         this->sigma1prior[0] = 2.5;
@@ -118,7 +107,7 @@ public:
         this->sigmavpriortype = 1; //0-invgamma 1-lognormal 2-invgaussian
         this->sigmavprior[0] = 2.5;
         this->sigmavprior[1] = 0.025;
-        this->sigmavlognormalprior[0]  = -2.5;
+        this->sigmavlognormalprior[0]  = -2.0;
         this->sigmavlognormalprior[1]  = 0.5;
         this->sigmavinvgaussianprior[0] = 0.5;
         this->sigmavinvgaussianprior[1] = 0.5;
@@ -138,7 +127,6 @@ public:
     void simulateparamters();
     //
     void setprior(struct PriorStruct prior);
-    void setinits(struct InitsStruct inits);
     //
     double getalpha(int k);
     //
