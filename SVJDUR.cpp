@@ -135,12 +135,10 @@ void  SVJDUR::simulateparameters()
 {
     SVJ::simulateparameters();
     //
-    /*
     GammaDuration *gammadur = new GammaDuration(this->dur,this->alpha,this->n,this->lambda,this->random);
     gammadur->simulatelambda();
     this->lambda = gammadur->getlambda();
     delete gammadur;
-    */
 }
 //
 double  SVJDUR::getlambda()

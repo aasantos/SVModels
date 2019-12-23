@@ -47,7 +47,7 @@ int main(int argc,const char *argv[])
     int thin = atoi(argv[5]);
     //
     Random *random = new Random(720);
-    SVJDUR *obj = new SVJDUR(y,n,sigmav,phi1,sigma1,random,muj,sigmaj,theta,dur,theta);
+    SVJDUR *obj = new SVJDUR(y, n, sigmav, phi1, sigma1, random, muj, sigmaj, theta, dur, lambda);
     obj->simulatestatesadaptation(250);
     //
     for(int i=0;i<nwarmup;i++){
