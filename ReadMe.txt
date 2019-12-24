@@ -1,4 +1,4 @@
-This code estimate SV models through Bayesian estimation methods
+This code estimates SV models through Bayesian estimation methods
 with posterior distribution for the parameters approximated 
 through MCMC simulations.
 
@@ -28,7 +28,7 @@ How to run:
 Examples:
 
 ./SVEStim y5aapl.txt 10000 50000 10 sv5aapl.txt
-./SV2FDUREstim y5aapl.txt d5aapl.txt 10000 50000 10 sv2f5aapl.txt
+./SV2FDUREstim y5aapl.txt d5aapl.txt 10000 50000 10 sv2fdur5aapl.txt
 
 
 Data files
@@ -45,7 +45,6 @@ d5aapl.txt
 d15aapl.txt
 d5ge.txt
 d15ge.txt
-
 
 
 
